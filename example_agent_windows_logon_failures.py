@@ -59,16 +59,16 @@ BAN_PATH   = os.path.join(BASE_DIR, 'pf4625_bans.xml')
 DEFAULT_INI = {
     'pfSense': {
         'prefix'     : 'https',      # http | https
-        'host'       : '192.0.2.1',  # IP / FQDN do pfSense
-        'port'       : '443',        # Porta WebGUI
-        'ignore_ssl' : '0',          # 1 = desativa verificação TLS
-        'token'      : 'CHANGEME'    # Bearer Token da API
+        'host'       : '192.0.2.1',  # IP / FQDN on pfSense
+        'port'       : '443',        # WebGUI Port
+        'ignore_ssl' : '0',          # 1 = Deactive TLS verify important when using address by ip
+        'token'      : 'CHANGEME'    # Bearer Token da API, inside pfsense do: cat /usr/local/agent_apikey/api_key.txt 
     },
     'Policy': {
-        'fail_limit'    : '3',       # Falhas para bloquear
-        'window_min'    : '60',      # Janela p/ contagem (min)
-        'penalty_hours' : '24',      # 0 = permanente
-        'loop_seconds'  : '60'       # Livre entre ciclos (s)
+        'fail_limit'    : '3',       # Number of Logon failures from the same IP
+        'window_min'    : '60',      # Window Count in minutes
+        'penalty_hours' : '24',      # 0 = never unblock
+        'loop_seconds'  : '60'       # seconds to refresh data from event viewer in Windows.
     }
 }
 
