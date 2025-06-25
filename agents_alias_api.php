@@ -15,7 +15,7 @@ const ALIAS_NAME  = 'Agents_IP_Block_List';
 const ERRLOG      = '/tmp/agents_api_error.log';
 
 /* ---------- Error log -------------------------------------------------- */
-if (!file_exists(ERRLOG)) { touch(ERRLOG); chmod(ERRLOG, 0666); }
+if (!file_exists(ERRLOG)) { touch(ERRLOG); chmod(ERRLOG, 0600); }
 ini_set('log_errors', '1');
 ini_set('error_log',  ERRLOG);
 ini_set('display_errors', '0');
