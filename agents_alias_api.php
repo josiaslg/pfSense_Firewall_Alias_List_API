@@ -46,6 +46,12 @@ if ($tsRaw !== '') {
 }
 
 /* ---------- Load XML & locate alias ----------------------------------- */
+$cfgReadable = file_exists(CONFIG_PATH) && is_readable(CONFIG_PATH);
+if (!$cfgReadable) {
+    http_response_code(500);
+    echo '{"error":"config missing"}';
+    exit;
+}
 $xml      = new SimpleXMLElement(file_get_contents(CONFIG_PATH));
 $aliases  = $xml->aliases ?: $xml->addChild('aliases');
 
