@@ -2,16 +2,9 @@
 /**
  * Agents Alias API — IPv4 (/32) & IPv6 (/128) with auto-create
  * ---------------------------------------------------------------------------
- * Author   : Josias L. Gonçalves  ·  josiaslg@bsd.com.br | josiaslg@cloudunix.com.br
+ * Author   : Josias L. Gonçalves · josiaslg@bsd.com.br | josiaslg@cloudunix.com.br
  * License  : BSD-3-Clause
- * Updated  : 25-Jun-2025 00:45 BRT
- *
- * Adds / deletes / lists hosts in the alias “Agents_IP_Block_List”.
- * • IPv4 stored as /32 • IPv6 stored as /128
- * • Duplicate ADD ⇒ status "exists"
- * • If the alias does not exist, it is created on-the-fly (empty) so the
- *   first call from the installer succeeds.
- * • Saves to /conf/config.xml, purges /tmp/config.cache, reloads filter.
+ * Updated  : 25-Jun-2025 01:10 BRT
  */
 
 declare(strict_types=1);
@@ -27,7 +20,7 @@ ini_set('log_errors', '1');
 ini_set('error_log',  ERRLOG);
 ini_set('display_errors', '0');
 
-/* ---------- Pre-flight key --------------------------------------------- */
+/* ---------- Pre-flight key -------------------------------------------- */
 $dir = dirname(APIKEY_PATH);
 if (!is_dir($dir)) mkdir($dir, 0700, true);
 if (!file_exists(APIKEY_PATH)) { http_response_code(500); header('Content-Type: application/json'); echo '{"error":"API key missing"}'; exit; }
@@ -46,11 +39,10 @@ $action = $_GET['action'] ?? 'list';   // list | add | del
 $ipRaw  = $_GET['ip'] ?? '';
 $tsRaw  = $_GET['ts'] ?? '';
 
-/* ---------- Load XML --------------------------------------------------- */
-$xml = new SimpleXMLElement(file_get_contents(CONFIG_PATH));
-$aliases = $xml->aliases ?: $xml->addChild('aliases');
+/* ---------- Load XML & locate alias ----------------------------------- */
+$xml      = new SimpleXMLElement(file_get_contents(CONFIG_PATH));
+$aliases  = $xml->aliases ?: $xml->addChild('aliases');
 
-/* ---------- Locate alias ---------------------------------------------- */
 $alias = null;
 foreach ($aliases->alias as $a) {
     if ((string)$a->name === ALIAS_NAME) { $alias = $a; break; }
@@ -64,9 +56,9 @@ if (!$alias) {
     $alias->addChild('address', '');
     $alias->addChild('descr',  '');
     $alias->addChild('detail', '');
-    /* Persist immediately so next calls see it */
     file_put_contents(CONFIG_PATH, $xml->asXML());
     @unlink('/tmp/config.cache');
+    shell_exec('/rc.filter_configure_sync');   // <-- new: load empty alias
 }
 
 /* ---------- Split address / detail ------------------------------------ */
