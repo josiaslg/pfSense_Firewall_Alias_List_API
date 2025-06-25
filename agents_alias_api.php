@@ -38,6 +38,12 @@ header('Content-Type: application/json');
 $action = $_GET['action'] ?? 'list';   // list | add | del
 $ipRaw  = $_GET['ip'] ?? '';
 $tsRaw  = $_GET['ts'] ?? '';
+if ($tsRaw !== '') {
+    $dt = DateTime::createFromFormat(DateTime::ATOM, $tsRaw);
+    if (!$dt || $dt->format(DateTime::ATOM) !== $tsRaw) {
+        http_response_code(400); echo '{"error":"invalid timestamp"}'; exit;
+    }
+}
 
 /* ---------- Load XML & locate alias ----------------------------------- */
 $xml      = new SimpleXMLElement(file_get_contents(CONFIG_PATH));
